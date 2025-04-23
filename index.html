@@ -9,6 +9,8 @@
 
     addEventListener('DOMContentLoaded', () => {
       registerSelectEvent();
+      endpoint = readEndpointFromSelect();
+
       setEndpoints(endpoint);
 
       initIframeChart();
@@ -23,6 +25,11 @@
       select.addEventListener('change', (event) => {
         setEndpoints(event.target.value);
       })
+    }
+
+    function readEndpointFromSelect() {
+      const select = document.getElementById('endpoint');
+      return select.options[select.selectedIndex].value;
     }
 
     function setEndpoints(endpoint) {
@@ -41,22 +48,24 @@
 
     function initIframeChart() {
       const iframe = document.getElementById('chart');
-      iframe.onload = () => {
-        const iframeWindow = iframe?.contentWindow;
-        if (iframeWindow) {
-          iframeWindow.postMessage(configuratorStateChart, '*');
+      const handleMessage = (e) => {
+        if (e.data?.type === "ready" && e.source === iframe.contentWindow) {
+          iframe.contentWindow?.postMessage(configuratorStateChart, "*");
+          window.removeEventListener("message", handleMessage);
         }
       };
+      window.addEventListener("message", handleMessage);
     }
 
     function initIframeMap() {
       const iframe = document.getElementById('map');
-      iframe.onload = () => {
-        const iframeWindow = iframe?.contentWindow;
-        if (iframeWindow) {
-          iframeWindow.postMessage(configuratorStateMap, '*');
+      const handleMessage = (e) => {
+        if (e.data?.type === "ready" && e.source === iframe.contentWindow) {
+          iframe.contentWindow?.postMessage(configuratorStateMap, "*");
+          window.removeEventListener("message", handleMessage);
         }
       };
+      window.addEventListener("message", handleMessage);
     }
 
     function populateFormData() {
@@ -421,7 +430,7 @@
   <h1>Preview via API config testing</h1>
   <div>
     <label for="endpoint">Endpoint:</label>
-    <select id="endpoint" autocomplete="off">
+    <select id="endpoint">
       <option value="https://visualize.admin.ch/de/preview">PROD</option>
       <option value="https://int.visualize.admin.ch/de/preview">INT</option>
       <option value="https://test.visualize.admin.ch/de/preview">TEST</option>
