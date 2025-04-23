@@ -30,13 +30,13 @@
       chart.src = endpoint;
 
       const formChart = document.getElementById('form-chart');
-      formChart.action = endpoint;
+      formChart.action = endpoint + '_post';
 
       const map = document.getElementById('map');
       map.src = endpoint;
 
       const formMap = document.getElementById('form-map');
-      formMap.action = endpoint;
+      formMap.action = endpoint + '_post';
     }
 
     function initIframeChart() {
